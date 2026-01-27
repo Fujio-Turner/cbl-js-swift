@@ -60,6 +60,32 @@ public struct QueryHelper {
                     if let int64Value = value as? Int64 {
                         parameters.setInt64(int64Value, forName: key)
                     }
+                case "vector":
+                    if let vectorValue = value as? [Double] {
+                        parameters.setArray(vectorValue, forName: key)
+                    } else if let vectorValue = value as? [NSNumber] {
+                        let doubleArray = vectorValue.map { $0.doubleValue }
+                        parameters.setArray(doubleArray, forName: key)
+                    } else if let vectorValue = value as? [Float] {
+                        let doubleArray = vectorValue.map { Double($0) }
+                        parameters.setArray(doubleArray, forName: key)
+                    } else if let vectorValue = value as? [Any] {
+                        let doubleArray = vectorValue.compactMap { element -> Double? in
+                            if let num = element as? NSNumber {
+                                return num.doubleValue
+                            } else if let num = element as? Double {
+                                return num
+                            } else if let num = element as? Float {
+                                return Double(num)
+                            } else if let num = element as? Int {
+                                return Double(num)
+                            }
+                            return nil
+                        }
+                        if doubleArray.count == vectorValue.count {
+                            parameters.setArray(doubleArray, forName: key)
+                        }
+                    }
                 case "value":
                         parameters.setValue(value, forName: key)
                 default:

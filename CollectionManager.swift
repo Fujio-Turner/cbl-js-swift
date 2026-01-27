@@ -213,43 +213,7 @@ public class CollectionManager {
         }
     }
     
-    /// Gets a VectorIndexUpdater for lazy indexing of a vector index.
-    /// - Parameters:
-    ///   - indexName: The name of the vector index
-    ///   - limit: Maximum number of vectors to update in this batch
-    ///   - collectionName: The collection name
-    ///   - scopeName: The scope name
-    ///   - databaseName: The database name
-    /// - Returns: VectorIndexUpdater if there are vectors to update, nil otherwise
-    /// - Throws: VectorIndexError or CollectionError on failure
-    public func getVectorIndexUpdater(_ indexName: String,
-                                      limit: Int,
-                                      collectionName: String,
-                                      scopeName: String,
-                                      databaseName: String) throws -> VectorIndexUpdater? {
-        
-        guard let collection = try self.getCollection(
-            collectionName,
-            scopeName: scopeName,
-            databaseName: databaseName) else {
-            throw CollectionError.unableToFindCollection(
-                collectionName: collectionName,
-                scopeName: scopeName,
-                databaseName: databaseName)
-        }
-        
-        do {
-            guard let index = try collection.index(forName: indexName) as? VectorIndex else {
-                throw VectorIndexError.indexCreationFailed("Index '\(indexName)' is not a vector index or does not exist")
-            }
-            
-            return try index.beginUpdate(limit: UInt64(limit))
-        } catch let error as VectorIndexError {
-            throw error
-        } catch {
-            throw VectorIndexError.updaterError(error.localizedDescription)
-        }
-    }
+
     
     public func deleteIndex(_ indexName: String,
                             collectionName: String,
